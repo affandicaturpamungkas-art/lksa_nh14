@@ -35,7 +35,8 @@ if (!$data_ka) {
 
 $base_url = "http://" . $_SERVER['HTTP_HOST'] . "/lksa_nh/";
 $foto_ka = $data_ka['Foto'] ?? '';
-$foto_path = $foto_ka ? $base_url . 'assets/img/' . $foto_ka : $base_url . 'assets/img/kotak_amal_makmur_deb0a.jpg'; // Menggunakan default KA
+// Menggunakan gambar default yayasan.png
+$foto_path = $foto_ka ? $base_url . 'assets/img/' . $foto_ka : $base_url . 'assets/img/yayasan.png'; 
 ?>
 
 <div class="content" style="padding: 0; background: none; box-shadow: none;">
@@ -90,7 +91,7 @@ $foto_path = $foto_ka ? $base_url . 'assets/img/' . $foto_ka : $base_url . 'asse
             <div class="form-section">
                 <h2><i class="fas fa-camera"></i> Foto Kotak Amal</h2>
                 <div class="form-group" style="text-align: center;">
-                    <img src="../assets/img/<?php echo htmlspecialchars($data_ka['Foto'] ?? 'kotak_amal_makmur_deb0a.jpg'); ?>" alt="Foto Kotak Amal" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid #F97316; margin-bottom: 10px;">
+                    <img src="../assets/img/<?php echo htmlspecialchars($data_ka['Foto'] ?? 'yayasan.png'); ?>" alt="Foto Kotak Amal" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid #F97316; margin-bottom: 10px;">
                 </div>
                 
                 <div class="form-group">

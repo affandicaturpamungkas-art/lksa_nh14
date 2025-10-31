@@ -51,9 +51,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $keterangan = $_POST['keterangan'] ?? ''; // Ambil keterangan yang mungkin ditambahkan
     $foto_path = $foto_lama;
     
-    // Tentukan URL redirect setelah sukses
+    // Cek apakah user yang login adalah Pemilik Kotak Amal (untuk menentukan redirect)
     $is_pemilik_ka_logged_in = isset($_SESSION['is_pemilik_kotak_amal']) && $_SESSION['is_pemilik_kotak_amal'] === true;
-    $redirect_url = $is_pemilik_ka_logged_in ? "dashboard_pemilik_kotak_amal.php" : "kotak-amal.php";
 
     // Menangani unggahan foto baru
     if (!empty($_FILES['foto']['name'])) {
@@ -74,7 +73,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Kueri SQL untuk memperbarui data kotak amal (tambahan Ket)
-    // Query ini harus sama persis dengan yang ada di database Anda
     $sql = "UPDATE KotakAmal SET Nama_Toko = ?, Alamat_Toko = ?, Nama_Pemilik = ?, WA_Pemilik = ?, Email = ?, Jadwal_Pengambilan = ?, Foto = ?, Ket = ? WHERE ID_KotakAmal = ?";
     $stmt = $conn->prepare($sql);
 
@@ -96,15 +94,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     );
 
     if ($stmt->execute()) {
-        header("Location: " . $redirect_url . "?status=success");
+        // --- PERBAIKAN REDIRECT: Kembali ke halaman Detail/Preview yang baru saja diedit ---
+        if ($is_pemilik_ka_logged_in) {
+            // Pemilik KA (Mengarah ke Dashboard mereka)
+            header("Location: dashboard_pemilik_kotak_amal.php?status=success");
+        } else {
+            // Admin / Pegawai (Mengarah ke halaman Detail/Preview)
+            header("Location: detail_kotak_amal.php?id=" . $id_kotak_amal . "&status=success");
+        }
         exit;
     } else {
         // Tampilkan pesan error MySQL spesifik agar mudah di-debug
         die("Error saat memperbarui data kotak amal. Cek koneksi DB atau batasan kolom: " . $stmt->error);
     }
 } else {
-    // Jika tidak ada data POST, redirect kembali ke form edit
-    $id_kotak_amal = $_GET['id'] ?? ''; // Cobalah mendapatkan ID dari GET jika POST gagal
+    // Jika tidak ada data POST (mungkin akses langsung atau kegagalan form), redirect.
+    $id_kotak_amal = $_GET['id'] ?? '';
     if ($id_kotak_amal) {
         header("Location: edit_kotak_amal.php?id=" . $id_kotak_amal);
     } else {

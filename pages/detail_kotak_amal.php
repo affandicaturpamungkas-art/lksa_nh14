@@ -34,8 +34,8 @@ $map_link = "https://maps.google.com/maps?q={$latitude},{$longitude}&z=15&output
 
 $base_url = "http://" . $_SERVER['HTTP_HOST'] . "/lksa_nh/";
 $foto_ka = $data_ka['Foto'] ?? '';
-// Menggunakan gambar default yang sudah ada
-$foto_path = $foto_ka ? $base_url . 'assets/img/' . $foto_ka : $base_url . 'assets/img/kotak_amal_makmur_deb0a.jpg'; 
+// Menggunakan gambar dari data, fallback ke yayasan.png
+$foto_path = $foto_ka ? $base_url . 'assets/img/' . $foto_ka : $base_url . 'assets/img/yayasan.png'; 
 ?>
 <style>
     /* Variabel Warna Elegan */

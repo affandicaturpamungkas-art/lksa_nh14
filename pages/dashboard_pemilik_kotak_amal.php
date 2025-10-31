@@ -42,8 +42,8 @@ $sql_riwayat = "SELECT dka.*, u.Nama_User FROM Dana_KotakAmal dka
 $result_riwayat = $conn->query($sql_riwayat);
 
 $base_url = "http://" . $_SERVER['HTTP_HOST'] . "/lksa_nh/";
-// Menggunakan foto dari database, fallback ke foto default kotak amal
-$foto_path = $foto_kotak_amal ? $base_url . 'assets/img/' . $foto_kotak_amal : $base_url . 'assets/img/kotak_amal_makmur_deb0a.jpg';
+// Menggunakan foto dari database, fallback ke yayasan.png
+$foto_path = $foto_kotak_amal ? $base_url . 'assets/img/' . $foto_kotak_amal : $base_url . 'assets/img/yayasan.png';
 
 $conn->close();
 ?>

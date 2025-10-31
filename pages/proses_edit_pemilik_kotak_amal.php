@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $foto_path = $foto_lama;
     
     // Tentukan URL redirect setelah sukses
-    $redirect_url = "dashboard_pemilik_kotak_amal.php?status=success";
+    $redirect_url = "dashboard_pemilik_kotak_amal.php?status=success"; // Menambahkan status sukses
 
     // Menangani unggahan foto baru
     if (!empty($_FILES['foto']['name'])) {

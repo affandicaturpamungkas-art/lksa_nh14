@@ -4,7 +4,7 @@ include '../config/database.php';
 
 // Fungsi untuk mengunggah file foto (MENGGUNAKAN LOGIKA NAMA BARU)
 function handle_upload($file, $nama_toko) {
-    // --- PERBAIKAN: Mengganti hardcode path dengan path relatif yang dinamis ---
+    // ... (Fungsi handle_upload tidak berubah) ...
     $target_dir = __DIR__ . '/../assets/img/';
     
     $file_extension = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
@@ -41,27 +41,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id_lksa = $_POST['id_lksa'] ?? '';
     $nama_toko = $_POST['nama_toko'] ?? '';
     
-    // MENGGUNAKAN INPUT MANUAL SEBAGAI ALAMAT TOKO LENGKAP
-    $alamat_toko = $_POST['alamat_detail_manual'] ?? $_POST['alamat_toko'] ?? ''; // Fallback ke alamat_toko jika ada
-    
+    // MENGGUNAKAN FIELD ALAMAT GABUNGAN
+    $alamat_toko = $_POST['alamat_toko'] ?? ''; // <--- Ambil alamat lengkap dari hidden field
+
+    // Mengambil data wilayah yang dikirim dari hidden field (Nama Wilayah)
     $nama_pemilik = $_POST['nama_pemilik'] ?? '';
     $wa_pemilik = $_POST['wa_pemilik'] ?? '';
     $email_pemilik = $_POST['email_pemilik'] ?? '';
-    
-    // Data Tanggal Pengambilan (YYYY-MM-DD)
     $jadwal_pengambilan = $_POST['jadwal_pengambilan'] ?? ''; 
-    
     $keterangan = $_POST['keterangan'] ?? '';
     $latitude = $_POST['latitude'] ?? null;
     $longitude = $_POST['longitude'] ?? null;
     $foto_path = null;
     
-    // VARIABEL WILAYAH DIHAPUS DAN DISET NULL/KOSONG
-    $provinsi_name = null;
-    $kabupaten_name = null;
-    $kecamatan_name = null;
-    $kelurahan_name = null;
-    // END: MENGAMBIL NAMA WILAYAH
+    // VARIABEL WILAYAH BARU (DIAMBIL DARI FIELD HIDDEN)
+    $provinsi_name = $_POST['ID_Provinsi'] ?? ''; 
+    $kabupaten_name = $_POST['ID_Kabupaten'] ?? ''; 
+    $kecamatan_name = $_POST['ID_Kecamatan'] ?? ''; 
+    $kelurahan_name = $_POST['ID_Kelurahan'] ?? ''; 
     
     // Menangani unggahan foto
     if (!empty($_FILES['foto']['name'])) {
@@ -81,7 +78,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id_kotak_amal = "KA_LKSA_NH_" . $tgl_id . "_" . str_pad($counter, 3, '0', STR_PAD_LEFT);
 
     // Kueri SQL untuk memasukkan data kotak amal (16 Kolom)
-    // Kolom ID_Provinsi, ID_Kabupaten, ID_Kecamatan, ID_Kelurahan sekarang menyimpan NULL
     $sql = "INSERT INTO KotakAmal (ID_KotakAmal, Id_lksa, Nama_Toko, Alamat_Toko, ID_Provinsi, ID_Kabupaten, ID_Kecamatan, ID_Kelurahan, Nama_Pemilik, WA_Pemilik, Email, Jadwal_Pengambilan, Ket, Foto, Latitude, Longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
 
@@ -95,10 +91,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $id_lksa, 
         $nama_toko, 
         $alamat_toko, 
-        $provinsi_name, // NULL
-        $kabupaten_name, // NULL
-        $kecamatan_name, // NULL
-        $kelurahan_name, // NULL
+        $provinsi_name, // <-- Nilai dari API Wilayah
+        $kabupaten_name, // <-- Nilai dari API Wilayah
+        $kecamatan_name, // <-- Nilai dari API Wilayah
+        $kelurahan_name, // <-- Nilai dari API Wilayah
         $nama_pemilik, 
         $wa_pemilik, 
         $email_pemilik, 

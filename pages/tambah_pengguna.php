@@ -39,7 +39,6 @@ include '../includes/header.php'; // LOKASI BARU
                         $is_pimpinan_pusat = ($_SESSION['jabatan'] == 'Pimpinan' && $_SESSION['id_lksa'] == 'Pimpinan_Pusat');
                         
                         if ($is_pimpinan_pusat) { ?>
-                            <option value="Pimpinan">Pimpinan (Cabang)</option> 
                             <option value="Kepala LKSA">Kepala LKSA</option>
                             <option value="Pegawai">Pegawai</option>
                             <option value="Petugas Kotak Amal">Petugas Kotak Amal</option>
