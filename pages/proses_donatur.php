@@ -45,36 +45,84 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'] ?? '';
     $alamat_lengkap = $_POST['alamat_lengkap'] ?? '';
     $status_donasi = $_POST['status_donasi'] ?? '';
-    $tgl_rutinitas = null; // Contoh jika status rutin
+    $tgl_rutinitas = $_POST['tgl_rutinitas'] ?? null; // <-- DIPERBARUI: Mengambil Tgl_Rutinitas dari POST
+    
+    // MENGAMBIL DATA WILAYAH BARU DARI HIDDEN FIELDS (Nama kolom sesuai database)
+    $id_provinsi = $_POST['ID_Provinsi'] ?? null;
+    $id_kabupaten = $_POST['ID_Kabupaten'] ?? null;
+    $id_kecamatan = $_POST['ID_Kecamatan'] ?? null;
+    $id_kelurahan = $_POST['ID_Kelurahan'] ?? null;
 
-    // Membuat ID Donatur yang unik sesuai format LKSA_NH_thbltgl_XXX
+    // ==================================================================================
+    // PERBAIKAN KRITIS: LOGIKA PEMBUATAN ID MENGGUNAKAN MAX(ID) UNTUK MENGHINDARI DUPLIKAT
+    // ==================================================================================
     $tgl_id = date('ymd');
-    $counter_sql = "SELECT COUNT(*) AS total FROM Donatur WHERE ID_donatur LIKE 'LKSA_NH_{$tgl_id}_%'";
-    $result = $conn->query($counter_sql);
+    $prefix = "LKSA_NH_" . $tgl_id . "_";
+    
+    // Query untuk mendapatkan ID Donatur tertinggi hari ini
+    $max_id_sql = "SELECT MAX(ID_donatur) AS max_id FROM Donatur WHERE ID_donatur LIKE '{$prefix}%'";
+    $result = $conn->query($max_id_sql);
     $row = $result->fetch_assoc();
-    $counter = $row['total'] + 1;
-    $id_donatur = "LKSA_NH_" . $tgl_id . "_" . str_pad($counter, 3, '0', STR_PAD_LEFT);
+    $max_id = $row['max_id'];
+    
+    // Menentukan counter berikutnya
+    if ($max_id) {
+        // Ambil 3 digit terakhir (counter: e.g., '003')
+        $last_counter = (int)substr($max_id, -3);
+        $counter = $last_counter + 1;
+    } else {
+        // Belum ada data hari ini
+        $counter = 1;
+    }
+
+    $id_donatur = $prefix . str_pad($counter, 3, '0', STR_PAD_LEFT);
+    // ==================================================================================
     
     $foto_path = null;
     if (!empty($_FILES['foto']['name'])) {
-        $upload_result = handle_upload($_FILES['foto'], $nama_donatur); // Panggil fungsi dengan nama donatur
+        $upload_result = handle_upload($_FILES['foto'], $nama_donatur); 
         if (isset($upload_result['error'])) {
             die($upload_result['error']);
         }
         $foto_path = $upload_result['filename'];
     }
 
-    $status_data_active = 'Active'; // Tambahkan status data default
+    $status_data_active = 'Active'; 
 
-    // PERUBAHAN: Menambahkan kolom Status_Data (untuk arsip)
-    $sql = "INSERT INTO Donatur (ID_donatur, ID_LKSA, ID_user, Nama_Donatur, NO_WA, Alamat_Lengkap, Email, Foto, Status, Tgl_Rutinitas, Status_Data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    // PERUBAHAN KRITIS: QUERY INSERT DENGAN 15 KOLOM (Termasuk 4 Kolom Wilayah)
+    $sql = "INSERT INTO Donatur (ID_donatur, ID_LKSA, ID_user, Nama_Donatur, NO_WA, Alamat_Lengkap, Email, Foto, Status, Tgl_Rutinitas, Status_Data, ID_Provinsi, ID_Kota_Kab, ID_Kecamatan, ID_Kelurahan_Desa) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssssssssss", $id_donatur, $id_lksa, $id_user, $nama_donatur, $no_wa, $alamat_lengkap, $email, $foto_path, $status_donasi, $tgl_rutinitas, $status_data_active);
+    
+    if ($stmt === false) {
+        die("Error saat menyiapkan kueri: " . $conn->error);
+    }
+    
+    // Binding parameters (Total 15 parameter: 15 string 's')
+    $stmt->bind_param("sssssssssssssss", 
+        $id_donatur, 
+        $id_lksa, 
+        $id_user, 
+        $nama_donatur, 
+        $no_wa, 
+        $alamat_lengkap, 
+        $email, 
+        $foto_path, 
+        $status_donasi, 
+        $tgl_rutinitas, // <-- MENGGUNAKAN NILAI BARU DARI POST
+        $status_data_active,
+        // Kolom Wilayah Baru (Sesuai nama kolom di database Anda)
+        $id_provinsi,
+        $id_kabupaten,
+        $id_kecamatan,
+        $id_kelurahan
+    );
 
     if ($stmt->execute()) {
         header("Location: donatur.php?status=success");
         exit;
     } else {
+        // Jika masih ada error (meskipun sudah menggunakan MAX ID), mungkin ada konflik lain.
         die("Error saat menyimpan donatur: " . $stmt->error);
     }
 } else {

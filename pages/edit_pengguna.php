@@ -36,10 +36,13 @@ if (!$data_user) {
                 <div class="form-group">
                     <label>Jabatan:</label>
                     <select name="jabatan" required>
-                        <option value="Pimpinan" <?php echo ($data_user['Jabatan'] == 'Pimpinan') ? 'selected' : ''; ?>>Pimpinan</option>
                         <option value="Kepala LKSA" <?php echo ($data_user['Jabatan'] == 'Kepala LKSA') ? 'selected' : ''; ?>>Kepala LKSA</option>
                         <option value="Pegawai" <?php echo ($data_user['Jabatan'] == 'Pegawai') ? 'selected' : ''; ?>>Pegawai</option>
                         <option value="Petugas Kotak Amal" <?php echo ($data_user['Jabatan'] == 'Petugas Kotak Amal') ? 'selected' : ''; ?>>Petugas Kotak Amal</option>
+                        
+                        <?php if ($data_user['Jabatan'] == 'Pimpinan') { ?>
+                             <option value="Pimpinan" selected style="background-color: #f0f0f0;">Pimpinan (Tidak Dapat Diubah)</option>
+                        <?php } ?>
                     </select>
                 </div>
                 <div class="form-group">

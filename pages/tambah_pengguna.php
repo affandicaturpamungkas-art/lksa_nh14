@@ -1,8 +1,7 @@
 <?php
 session_start();
 include '../config/database.php';
-// include '../includes/header.php'; // Pindahkan ke bawah
-
+//
 if ($_SESSION['jabatan'] != 'Pimpinan' && $_SESSION['jabatan'] != 'Kepala LKSA') {
     die("Akses ditolak.");
 }
@@ -14,6 +13,78 @@ $sidebar_stats = ''; // Pastikan sidebar tampil
 
 include '../includes/header.php'; // LOKASI BARU
 ?>
+<style>
+    /* Style Tambahan untuk Tampilan Form Ramping dan Simpel */
+    :root {
+        --form-bg-color: #FFFFFF;
+        --border-color-soft: #D1D5DB;
+        --input-focus-color: #06B6D4;
+        --text-label: #4B5563;
+        --font-size-small: 0.9em;
+    }
+    
+    .form-container {
+        max-width: 650px; /* Lebar lebih fokus */
+        margin: 0 auto;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border-top: 3px solid var(--input-focus-color);
+    }
+    
+    .form-section h2 {
+        font-size: 1.4em;
+        font-weight: 600;
+        border-bottom: 1px solid var(--border-color-soft);
+        padding-bottom: 8px;
+    }
+    
+    /* Input dan Select agar terlihat ramping */
+    .form-group label {
+        font-size: var(--font-size-small);
+        color: var(--text-label);
+        font-weight: 600;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="password"],
+    .form-group input[type="file"],
+    .form-group select {
+        padding: 10px 12px; /* Padding dikurangi */
+        border: 1px solid var(--border-color-soft);
+        border-radius: 6px; /* Lebih ramping */
+        width: 100%;
+        box-sizing: border-box;
+        font-size: var(--font-size-small); /* Ukuran font lebih kecil/simpel */
+        background-color: var(--form-bg-color);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+        border-color: var(--input-focus-color);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2); /* Shadow fokus yang simpel */
+    }
+    
+    .form-grid {
+        gap: 20px;
+    }
+    
+    /* Tombol Aksi */
+    .btn-success {
+        background-color: #10B981; /* Emerald Green */
+        font-weight: 600;
+        padding: 10px 20px;
+    }
+    .btn-cancel {
+        background-color: #6B7280;
+        font-weight: 600;
+        padding: 10px 20px;
+    }
+</style>
+
 <div class="form-container">
     <h1>Tambah Pengguna Baru</h1>
     <form action="proses_pengguna.php" method="POST" enctype="multipart/form-data">
@@ -79,8 +150,8 @@ include '../includes/header.php'; // LOKASI BARU
         </div>
         
         <div class="form-actions">
-            <button type="submit" class="btn btn-success">Simpan</button>
-            <a href="users.php" class="btn btn-cancel">Batal</a>
+            <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Simpan</button>
+            <a href="users.php" class="btn btn-cancel"><i class="fas fa-times-circle"></i> Batal</a>
         </div>
     </form>
 </div>

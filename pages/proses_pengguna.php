@@ -160,7 +160,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $update_pimpinan_stmt->close();
             }
             
-            header("Location: users.php");
+            // --- PERUBAHAN KRITIS: REDIRECT KE DETAIL/PREVIEW PENGGUNA ---
+            header("Location: detail_pengguna.php?id=" . $id_user);
+            exit;
+            
         } else {
             echo "Error: " . $stmt->error;
         }

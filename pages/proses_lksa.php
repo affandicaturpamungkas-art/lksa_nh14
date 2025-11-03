@@ -142,16 +142,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
              die("Error saat menyiapkan kueri UPDATE: " . $conn->error);
         }
         
-        $update_stmt->bind_param("ssssss", $nama_lksa, $alamat_lengkap_final, $nomor_wa_lksa, $email_lksa, $final_logo_path, $id_lksa);
+        // Catatan: Di halaman edit_lksa.php, Alamat detail tidak dipisah berdasarkan wilayah,
+        // sehingga kita menggunakan Alamat Lengkap yang tidak dapat diubah (atau dikosongkan jika field tidak ada).
+        // Kita menggunakan nilai Alamat yang sudah ada dari form edit.
+        $alamat_dari_edit_form = $_POST['alamat_lksa'] ?? $data_lksa['Alamat'] ?? ''; // Mengambil dari form edit_lksa.php
+
+        $update_stmt->bind_param("ssssss", $nama_lksa, $alamat_dari_edit_form, $nomor_wa_lksa, $email_lksa, $final_logo_path, $id_lksa);
 
         if (!$update_stmt->execute()) {
             die("Error saat memperbarui LKSA: " . $update_stmt->error);
         }
         $update_stmt->close();
-
+        
+        // --- PERUBAHAN REDIRECT UNTUK EDIT ---
+        $redirect_url = 'detail_lksa.php?id=' . $id_lksa;
+        header("Location: " . $redirect_url);
+        exit;
     }
     
-    // Redirect ke halaman LKSA (berlaku untuk tambah dan edit)
+    // Redirect default untuk action 'tambah' (jika tidak ada logic exit di atas)
     header("Location: lksa.php");
     exit;
 
